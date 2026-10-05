@@ -6,15 +6,13 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
@@ -40,20 +38,26 @@ public final class UnjustNickSwap extends JavaPlugin implements Listener {
         getLogger().info("UnjustNickSwap включен!");
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
-public void onPlayerDeath(PlayerDeathEvent event) {
-    Player player = event.getEntity();
-    UUID uuid = player.getUniqueId();
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        Player player = event.getEntity();
+        UUID uuid = player.getUniqueId();
 
-    if (!originalNames.containsKey(uuid)) {
-        originalNames.put(uuid, player.getName());
+        if (!originalNames.containsKey(uuid)) {
+            originalNames.put(uuid, player.getName());
+        }
+
+        String fakeName = generateFakeName();
+        fakeNames.put(uuid, fakeName);
+
+        // Задержка 1 секунда (20 тиков), чтобы DeathFakeQuit успел отправить сообщения
+        Bukkit.getScheduler().runTaskLater(
+            UnjustNickSwap.this,
+            () -> applyFakeName(player, fakeName),
+            20L
+        );
     }
 
-    String fakeName = generateFakeName();
-    fakeNames.put(uuid, fakeName);
-
-    applyFakeName(player, fakeName);
-}
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
