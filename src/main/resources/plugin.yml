@@ -1,0 +1,12 @@
+name: UnjustNickSwap
+version: 1.0
+main: ru.example.unjustnickswap.UnjustNickSwap
+api-version: '1.21'
+description: Меняет ник игрока при смерти на изменённый ник знаменитости
+author: YourName
+commands:
+  nickunjustswap:
+    description: Управление плагином UnjustNickSwap
+    usage: /nickunjustswap reset <ник>
+    aliases: [nus]
+    permission: unjust.admin
